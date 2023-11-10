@@ -1,19 +1,21 @@
 <template>
-  <img alt="Vue logo" width="200" height="200" src="./assets/logo.png" />
-  <div>
-    <select v-model="selectedCity">
-      <option v-for="(text, value) in regions" :key="value" :value="value">
+    <div class="logo">
+      <img alt="Vue logo" width="200" height="200" src="./assets/logo.png" />
+    </div>
+    <div>
+      Select region <select v-model="selectedCity">
+        <option v-for="(text, value) in regions" :key="value" :value="value">
         {{ text }}
-      </option>
-    </select>
-    <p>Selected Option: {{ selectedCity }}</p>
-  </div>
-  <region-properties :region="city" v-if="city" />
+        </option>
+      </select>
+    </div>
+    <region-properties :region="city" v-if="city" />
 </template>
 
 <script lang="ts">
 import { Subject, fdr, Graph } from '@kobrix/fdr'
 import { Bindings } from '@rdfjs/types'
+import { reactive } from 'vue'
 import { Options, Vue } from 'vue-class-component'
 import RegionProperties from './components/RegionProperties.vue'
 
@@ -24,9 +26,9 @@ import RegionProperties from './components/RegionProperties.vue'
   watch: {
     selectedCity: async function() {
       let s = this.graph.factory.subject(fdr.subjectId(this.selectedCity))
-      this.city = await this.graph.use(s)
-      console.log(this.city)
-    }    
+      s = await this.graph.use(s)
+      this.city = s.workingCopy(s => reactive(s))
+    }
   }
 })
 export default class App extends Vue {
@@ -37,8 +39,7 @@ export default class App extends Vue {
   
   async created() {
     let store = global["in_memory_store"]
-    this.graph = fdr.graph({ store })
-
+    this.graph = Object.freeze(fdr.graph({ store }))
     let availableCities = (await store.sparqlSelect({
       queryString: `
       PREFIX dbo: <http://dbpedia.org/ontology/>
@@ -58,9 +59,12 @@ export default class App extends Vue {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  color: #2c3e50;  
+}
+.logo {
+  text-align: left;
+  margin-top: 20px;
+  margin-bottom: 60px;
 }
 </style>
 
