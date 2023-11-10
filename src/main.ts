@@ -47,6 +47,17 @@ fdr.resolver.prefixResolver.withPrefixes(prefixes)
 async function populateWikidataForCity(store: InMemoryTripleStore, city: string) {
   let dbpedia = new SPARQLProtocolClient("https://dbpedia.org/sparql", "https://dbpedia.org/sparql/statements")
   let sparqlPrexies = Object.keys(prefixes).map(prefix => "PREFIX " + prefix + ": <" + prefixes[prefix] + ">").join("\n")
+  let qs = `
+  ${sparqlPrexies}
+
+  select distinct * where {
+    ${city} ?p ?o .
+    minus  {  ${city} dbo:wikiPageWikiLink ?o  }
+    minus {  ${city} foaf:depiction ?o  }
+    minus {  ${city} owl:sameAs ?o }
+    minus { ${city} <http://dbpedia.org/property/wikiPageUsesTemplate> ?o }
+  }` 
+  console.log('qs', qs)
   let queryResult: Array<object> = await dbpedia.sparqlSelect(
     { queryString: `
     ${sparqlPrexies}
@@ -61,13 +72,14 @@ async function populateWikidataForCity(store: InMemoryTripleStore, city: string)
   })
   
   queryResult.forEach( (row: {[index:string]: any}, index: number, array: object[] ) => {
-    let jsonToTerm = function(x: {type: string, value: string}): Literal|NamedNode {
+    type InJson = {type: string, value: string, 'xml:lang': string}
+    let jsonToTerm = function(x: InJson): Literal|NamedNode {
         if (x['type'] == 'uri')
           return rdfjs.named(x['value'])
         else // (x['type'] == 'literal')
-          return rdfjs.literal(x['value'])
+          return rdfjs.literal(x['value'], x['xml:lang'])
     }
-    let prop = jsonToTerm(row['p'] as {type: string, value: string}) as NamedNode
+    let prop = jsonToTerm(row['p'] as InJson) as NamedNode
     let value = jsonToTerm(row['o'])  
     let quad = fdr.quad(fdr.named(city), prop, value)
     // console.log(prop.value.toString())
@@ -100,5 +112,6 @@ let A = await store.sparqlSelect({queryString: `
     select * where { ?s ?p dbo:City } 
   `})
 console.log((A[0] as Bindings).get('s'))
+fdr.config.lang = "en"
 createApp(App).mount('#app')
 
