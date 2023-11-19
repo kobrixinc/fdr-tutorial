@@ -21,3 +21,12 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+src/go.js
+src/go.js.map
+src/inmemstore.js
+src/inmemstore.js.map
+src/main.js
+src/main.js.map
+src/sparqlendpoint.js
+src/sparqlendpoint.js.map
+src/assets/ontology--DEV_type=parsed.owl
