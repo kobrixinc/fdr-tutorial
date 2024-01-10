@@ -16,6 +16,8 @@
     </tr>       
   </table>
 
+  <button :click="region.commit()">Apply</button>
+
 </template>
 
 <script lang="ts">
@@ -25,13 +27,7 @@ import { Subject } from '@kobrix/fdr'
 @Options({
   props: [
     "region"
-  ],
-  watch: {
-    region: function (newRegion, currentRegion) {
-      if (currentRegion)
-        currentRegion.commit()
-    }
-  }
+  ]
 })
 export default class RegionProperties extends Vue {
   region!: Subject

@@ -25,9 +25,10 @@ import RegionProperties from './components/RegionProperties.vue'
   },
   watch: {
     selectedCity: async function() {
-      let s = this.graph.factory.subject(fdr.subjectId(this.selectedCity))
-      s = await this.graph.use(s)
-      this.city = s.workingCopy(s => reactive(s))
+      let cityId = fdr.subjectId(this.selectedCity)
+      let citySubject = this.graph.factory.subject(cityId)
+      citySubject = await this.graph.use(citySubject)
+      this.city = citySubject.workingCopy(s => reactive(s))
     }
   }
 })
