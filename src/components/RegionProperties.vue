@@ -16,7 +16,7 @@
     </tr>       
   </table>
 
-  <button :click="region.commit()">Apply</button>
+  <button @click="region.commit()">Apply</button>
 
 </template>
 
