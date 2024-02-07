@@ -278,5 +278,5 @@ In `src/main.ts` , the starting point for building the store is `populateInmemor
 
 ## What Next?
 
-This tutorial does cover all the basics in a fair amount of detail. FDR will be progressing as practical programming patterns using the semantic tech stack emerge. The API docs and the reference guide are your next documentation companions. It is based on the [RDFJS APIs] (https://rdf.js.org/). To interact with us, please join the Github discussions, submit questions, suggestions etc. 
+This tutorial does cover all the basics in a fair amount of detail. FDR will be progressing as practical programming patterns using the semantic tech stack emerge. The API docs and the reference guide are your next documentation companions. It is based on the [RDFJS APIs](https://rdf.js.org/). To interact with us, please join the Github discussions, submit questions, suggestions etc. 
 
