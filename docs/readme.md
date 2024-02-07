@@ -31,7 +31,7 @@ Before we get entangled into the complexities of a complete application with all
 
 For that, after you have made sure you have a running application, open the browser dev console and let's have some fun.
 
-The entry point to the APIs is an instance of `GraphEnvironment` (ref doc). There is a default environment provided by FDR conveniently called `fdr` and the tutorial sample application exposes it globally. Make sure you have it in your console, by just typing:
+The entry point to the APIs is an instance of [`GraphEnvironment`](https://kobrixinc.github.io/fdr/api/types/GraphEnvironment.html). There is a default environment provided by FDR conveniently called `fdr` and the tutorial sample application exposes it globally. Make sure you have it in your console, by just typing:
 
 ```
 > fdr
