@@ -1,3 +1,5 @@
+<base target="_blank">
+
 ## Welcome to the FDR Tutorial!
 
 This is a hands on introduction to the FDR library. A simple application is used in order to illustrate the core concepts. The application uses the VueJS framework, but the same architectural approach will work with any of the other major GUI frameworks. We will briefly explain VueJS concepts as we go. Such explanations are marked as block quotes that look like this:
