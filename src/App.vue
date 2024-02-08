@@ -1,7 +1,9 @@
 <template>
-    <div class="logo">
-      <img alt="Vue logo" width="200" height="200" src="./assets/logo.png" />
-    </div>
+    <div class="logo">      
+      <img alt="Vue logo" width="200" height="200" src="./assets/logo.png" />      
+      <h2>Green Horizon Foundation</h2>
+      <h4>(FDR Tutorial)</h4>
+    </div>    
     <div>
       Select region <select v-model="selectedCity">
         <option v-for="(text, value) in regions" :key="value" :value="value">
@@ -9,7 +11,7 @@
         </option>
       </select>
     </div>
-    <region-properties :region="city" v-if="city" />
+    <region-properties :region="city" v-if="city"/>
 </template>
 
 <script lang="ts">
@@ -65,8 +67,10 @@ export default class App extends Vue {
 .logo {
   text-align: left;
   margin-top: 20px;
-  margin-bottom: 60px;
+  margin-bottom: 20px;
 }
+
+
 </style>
 
 function Watch(arg0: string) {

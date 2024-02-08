@@ -9,7 +9,7 @@
     "go": "npx tsc && node dist/go.js"
   },
   "dependencies": {
-    "@kobrix/fdr": "file:../fdr",
+    "@kobrix/fdr": "file:../../code/fdr",
     "@rdfjs/data-model": "^2.0.0",
     "@rdfjs/dataset": "^2.0.0",
     "@rdfjs/types": "^1.1.0",

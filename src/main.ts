@@ -1,49 +1,40 @@
-
 import { createApp } from 'vue'
 import App from './App.vue'
 import { rdfjs, QuadAdded, fdr } from '@kobrix/fdr'
 import { SPARQLProtocolClient } from "@kobrix/fdr"
-// import {  Quadstore  } from 'quadstore'
-// import { BrowserLevel } from 'browser-level'
-// import { DataFactory } from 'rdf-data-factory'
-// import { Engine } from 'quadstore-comunica'
 import { InMemoryTripleStore } from "./inmemstore"
-import { Bindings, Literal, NamedNode, Quad } from "@rdfjs/types"
+import { Literal, NamedNode } from "@rdfjs/types"
 
-// const backend = new BrowserLevel('quadstore');
-// const dataFactory = new DataFactory();
-// const store = new Quadstore({ backend, dataFactory });
-// const engine = new Engine(store);
-// await store.open();
-// await store.clear();
-// await store.put(dataFactory.quad(dataFactory.namedNode('ex://s'), dataFactory.namedNode('ex://p'), dataFactory.namedNode('ex://o')));
-// const stream = await engine.queryBindings(`SELECT * WHERE { ?s ?p ?o }`);
-// stream.on('data', console.log);
-
-// let client = new SPARQLProtocolClient("https://dbpedia.org/sparql", "https://dbpedia.org/sparql/statements")
-
-// let G = new LocalGraph(client, "dbpedia")
-
-// let subject = G.factory.subject(new IRISubjectId("http://dbpedia.org/resource/Bulgaria"))
-
-// let data = await G.use(subject)
-
-// console.log(data)
-
+// We use an RDF Triplestore that is constructed in memory by
+// fetching some triples about major US cities from DBPedia.
+// The store implementation is a global variable so that it can
+// be easily accessed from the root GUI component.
 declare global {
   var in_memory_store: InMemoryTripleStore
 }
 
+// The prefixes are the standard ones used in DBPedia 
+// except for the last one - 'ghf' - which is for our
+// hypothetical organization.
 const prefixes: {[key: string]: any}  = {
   "dbr": "http://dbpedia.org/resource/",
   "dbo": "http://dbpedia.org/ontology/",
   "dbp": "http://dbpedia.org/property/",
   "foaf": "http://xmlns.com/foaf/0.1/",
-  "ulsini": "http://ulsini.org/ontology/"
+  "ghf": "http://green-horizon-foundation.org/ontology/"
 }
 
+// It is possible to implement any logic you want as name
+// resolution, but using prefixes being the most common one,
+// it is provided as a default by FDR. The 'withPrefixes'
+// function just adds to the existing prefix map.
 fdr.resolver.prefixResolver.withPrefixes(prefixes)
 
+// This function copies the triples where a given 'city' (an IRI) is the subject
+// to the in memory store. 
+// It makes use a Triplestore implementation provided by FDR which works with a 
+// backing endpoint, in this case DBPedia. We did not want to use DBPedia directly
+// as the backing triplestore because we cannot write to it. 
 async function populateWikidataForCity(store: InMemoryTripleStore, city: string) {
   let dbpedia = new SPARQLProtocolClient("https://dbpedia.org/sparql", "https://dbpedia.org/sparql/statements")
   let sparqlPrexies = Object.keys(prefixes).map(prefix => "PREFIX " + prefix + ": <" + prefixes[prefix] + ">").join("\n")
@@ -57,7 +48,6 @@ async function populateWikidataForCity(store: InMemoryTripleStore, city: string)
     minus {  ${city} owl:sameAs ?o }
     minus { ${city} <http://dbpedia.org/property/wikiPageUsesTemplate> ?o }
   }` 
-  console.log('qs', qs)
   let queryResult: Array<object> = await dbpedia.sparqlSelect(
     { queryString: `
     ${sparqlPrexies}
@@ -76,15 +66,12 @@ async function populateWikidataForCity(store: InMemoryTripleStore, city: string)
     let jsonToTerm = function(x: InJson): Literal|NamedNode {
         if (x['type'] == 'uri')
           return rdfjs.named(x['value'])
-        else // (x['type'] == 'literal')
+        else
           return rdfjs.literal(x['value'], x['xml:lang'])
     }
     let prop = jsonToTerm(row['p'] as InJson) as NamedNode
     let value = jsonToTerm(row['o'])  
     let quad = fdr.quad(fdr.named(city), prop, value)
-    // console.log(prop.value.toString())
-    // if (value.value.toString().indexOf("City") > -1)
-    //   console.log(prop, value)
     store.modify([new QuadAdded(quad)])
   })
 }
@@ -102,16 +89,13 @@ async function populateInmemoryStore() : Promise<InMemoryTripleStore> {
   return store
 }
 
-let store = global['in_memory_store'] = await populateInmemoryStore()
-let x = await store.fetch(fdr.named("dbr:Miami"))
-console.log('NY', x)
-//select ?c where { ?c a <http://dbpedia.org/ontology/City> }
-let A = await store.sparqlSelect({queryString: `
-    PREFIX dbo: <http://dbpedia.org/ontology/>
-
-    select * where { ?s ?p dbo:City } 
-  `})
-console.log((A[0] as Bindings).get('s'))
-fdr.config.lang = "en"
+global['in_memory_store'] = await populateInmemoryStore()
+// The default language of literal is English and 
+// its presence is optional as indicated by the question mark.
+fdr.config.lang = "en?" 
+// Making the fdr object global is not needed by the application strictly
+// speaking, but it's useful to interact with the API and the data through
+// the browser console.
+global['fdr'] = fdr
 createApp(App).mount('#app')
 
