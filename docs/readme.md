@@ -11,6 +11,8 @@ The tutorial aims to showcase some of the basic abstractions at the foundation o
 
 ## The App 
 
+**Git Repo** at [https://github.com/kobrixinc/fdr-tutorial](https://github.com/kobrixinc/fdr-tutorial)
+
 Imagine a hypothetical global organization, with local chapters in various cities where each chapter has its local office, regional lead and a number of members. Some information is simply public knowledge about geographical regions and it's available from DBPedia. Other information is application specific and following an application specific ontology.
 
 The flow of the application is simple:
